@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
-@Autonomous(name="Autonomous (Blue Tag 20)")
+@Autonomous(name="Autonomous (Red Tag 24)")
 public class AutonomousRed extends AutonomousBoth {
     @Override
     public void init() {
