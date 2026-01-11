@@ -53,7 +53,7 @@ public class RobotUtils {
     private double autoShotRpm = 0.0;
     private boolean autoShotRequested = false;
     private double FALLBACK_RPM = 2500.0;
-    private double REVERSE_DURATION = 0.2;
+    private double REVERSE_DURATION = 1;
 
     // Drive state
     public DriveState driveState = DriveState.STOPPED;
@@ -61,6 +61,7 @@ public class RobotUtils {
     private double driveStartTime = 0.0;
     private double driveEndTime = 0.0;
     private double imuOffset = 0.0;
+    private double driveTimePower = 0.0;
 
     // Hardware components
     private DcMotor frontLeftDrive = null;
@@ -195,10 +196,10 @@ public class RobotUtils {
         backRightDrive.setPower(backRightPower);
     }
 
-    public void driveForSeconds(double seconds) {
+    public void driveForSeconds(double seconds, double power) {
         driveStartTime = System.currentTimeMillis() / 1000.0;
         driveEndTime = driveStartTime + seconds;
-
+        driveTimePower = power;
         driveState = DriveState.DRIVING_TIME;
     }
 
@@ -269,6 +270,12 @@ public class RobotUtils {
 
         leftLaunch.setVelocity(velocity, AngleUnit.RADIANS);
         rightLaunch.setVelocity(velocity, AngleUnit.RADIANS);
+    }
+
+    public double getLaunchVelocity() {
+        if (leftLaunch == null || rightLaunch == null) return 0.0;
+
+        return leftLaunch.getVelocity(AngleUnit.RADIANS);
     }
 
     public void feedToLaunch(double power) {
@@ -393,7 +400,7 @@ public class RobotUtils {
                     driveState = DriveState.STOPPED;
                     return;
                 }
-                drive(0.4, 0.4, 0);
+                drive(driveTimePower, driveTimePower, 0);
         }
     }
 
@@ -403,7 +410,7 @@ public class RobotUtils {
     }
 
     public boolean isShotCompleted() {
-        return launchState == LaunchState.OFF;
+        return launchState == LaunchState.OFF && getLaunchVelocity() < TOLERANCE;
     }
 
     public boolean isStopped() {
