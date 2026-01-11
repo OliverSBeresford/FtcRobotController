@@ -5,12 +5,14 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import java.util.List;
+
 import android.util.Size;
 
 
@@ -52,7 +54,7 @@ public class RobotUtils {
     // Auto-shot (AprilTag align -> spin -> feed) variables
     private double autoShotRpm = 0.0;
     private boolean autoShotRequested = false;
-    private double FALLBACK_RPM = 2500.0;
+    private double FALLBACK_RPM = 2400.0;
     private double REVERSE_DURATION = 1;
 
     // Drive state
@@ -132,11 +134,6 @@ public class RobotUtils {
 
     public void setAprilTagID(int id) {
         tagID = id;
-        if (tagID == BLUE_TAG_ID) {
-            imuOffset = -90.0;
-        } else if (tagID == RED_TAG_ID) {
-            imuOffset = 90.0;
-        }
     }
 
     // This function drives the robot field-relative
@@ -148,7 +145,8 @@ public class RobotUtils {
         }
 
         // If any of the drive motors are not initialized, do nothing
-        else if (backLeftDrive == null || backRightDrive == null || frontLeftDrive == null || frontRightDrive == null) return;
+        else if (backLeftDrive == null || backRightDrive == null || frontLeftDrive == null || frontRightDrive == null)
+            return;
 
         // Convert direction being asked to drive to polar coordinates
         double theta = Math.atan2(forward, right);
@@ -168,7 +166,8 @@ public class RobotUtils {
 
     public void drive(double forward, double right, double rotate) {
         // If any of the drive motors are not initialized, do nothing
-        if (backLeftDrive == null || backRightDrive == null || frontLeftDrive == null || frontRightDrive == null) return;
+        if (backLeftDrive == null || backRightDrive == null || frontLeftDrive == null || frontRightDrive == null)
+            return;
 
         // Calculates the power needed for each wheel based on the amount of forward,
         // strafe right, and rotate
@@ -212,7 +211,8 @@ public class RobotUtils {
         turn = clamp(turn, -0.4, 0.4);
         drive(0, 0, turn);
 
-        if (Math.abs(error) < 3.0 && driveState == DriveState.TURNING) driveState = DriveState.STOPPED;
+        if (Math.abs(error) < 3.0 && driveState == DriveState.TURNING)
+            driveState = DriveState.STOPPED;
     }
 
     public void turnDegrees(double degrees) {
@@ -488,18 +488,18 @@ public class RobotUtils {
         }
 
         // Errors
-        double strafeError  = 0;       // Ignore strafe error for now
-        double bearingError     = pose.bearing;      // want bearing = 0
+        double strafeError = 0;       // Ignore strafe error for now
+        double bearingError = pose.bearing;      // want bearing = 0
 
         // Proportional control
-        double right   = strafeError * 0.05;
+        double right = strafeError * 0.05;
         double forward = 0;                    // no forward movement
-        double rotate  = -bearingError * 0.05;
+        double rotate = -bearingError * 0.05;
 
         // Clamp power (very important)
         forward = clamp(forward, -0.4, 0.4);
-        right   = clamp(right,   -0.4, 0.4);
-        rotate  = clamp(rotate,  -0.3, 0.3);
+        right = clamp(right, -0.4, 0.4);
+        rotate = clamp(rotate, -0.3, 0.3);
 
         drive(forward, right, rotate);
     }
