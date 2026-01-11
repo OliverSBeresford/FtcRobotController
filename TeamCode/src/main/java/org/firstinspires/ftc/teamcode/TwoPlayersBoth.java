@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 public abstract class TwoPlayersBoth extends OpMode {
 
@@ -20,6 +21,9 @@ public abstract class TwoPlayersBoth extends OpMode {
         telemetry.addLine("DRIVER (GP1): Left stick = drive/strafe, Right stick X = turn");
         telemetry.addLine("DRIVER (GP1): Hold LB = robot-relative, release LB = field-relative");
         telemetry.addLine("DRIVER (GP1): B = reset yaw");
+        telemetry.addLine("SHOOTER (GP2): Y = auto shot");
+        telemetry.addLine("SHOOTER (GP2): Right trigger = far shot");
+        telemetry.addLine("SHOOTER (GP2): Left trigger = near shot");
 
         if (gamepad1.b) {
             robot.resetImuYaw();
@@ -34,9 +38,9 @@ public abstract class TwoPlayersBoth extends OpMode {
         // ==========================================
         // OPERATOR (GAMEPAD 2) - INTAKE + SHOOTER
         // ==========================================
-        telemetry.addLine("OPERATOR (GP2): A = toggle intake motor");
-        telemetry.addLine("OPERATOR (GP2): Y = spin up + request shot");
-        telemetry.addLine("OPERATOR (GP2): X = stop shooter");
+        telemetry.addLine("SHOOTER (GP2): A = toggle intake motor");
+        telemetry.addLine("SHOOTER (GP2): Y = spin up + request shot");
+        telemetry.addLine("SHOOTER (GP2): X = stop shooter");
 
         // Toggle intake motor on GP2 A (debounced)
         if (gamepad2.a && !intakeWasPressed) {
@@ -50,6 +54,16 @@ public abstract class TwoPlayersBoth extends OpMode {
         if (gamepad2.y) {
             // NOTE: This is still 23 RPM (very slow). Increase if you want more speed
             robot.requestAutoShot();
+            robot.shootBallWhenReady();
+        }
+
+        if (gamepad2.right_trigger > 0) {
+            robot.startShooter(3000);
+            robot.shootBallWhenReady();
+        }
+
+        if (gamepad2.left_trigger > 0) {
+            robot.startShooter(2500);
             robot.shootBallWhenReady();
         }
 
@@ -70,6 +84,22 @@ public abstract class TwoPlayersBoth extends OpMode {
 
         telemetry.addData("Launcher Velocity (rad/s)", velRad);
         telemetry.addData("Launcher Velocity (RPM)", velRpm);
+
+        // Get data for telemetry
+        AprilTagPoseFtc pose = robot.getApriltagData();
+        double recommendedRpm = robot.calculateRPM();
+        // ===== TELEMETRY =====
+        telemetry.addData("Tag Seen?", (pose != null));
+        telemetry.addData("Tag ID", robot.tagID);
+
+        if (pose != null) {
+            telemetry.addData("Range (in)", String.format("%.1f", pose.range));
+        } else {
+            telemetry.addData("Range (in)", "N/A");
+        }
+
+        telemetry.addData("Recommended RPM", String.format("%.0f", recommendedRpm));
+        telemetry.update();
 
         telemetry.update();
     }
