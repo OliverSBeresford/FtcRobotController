@@ -2,10 +2,11 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @TeleOp(name="TwoPlayers")
-public class TwoPlayers extends OpMode {
+public class TwoPlayersBlue extends OpMode {
 
     private RobotUtils robot = null;
 
@@ -15,6 +16,7 @@ public class TwoPlayers extends OpMode {
     @Override
     public void init() {
         robot = new RobotUtils(hardwareMap);
+        robot.setAprilTagID(RobotUtils.BLUE_TAG_ID);
         telemetry.addLine("Robot Ready.");
         telemetry.addLine("Driver = Gamepad1 (drive)");
         telemetry.addLine("Operator = Gamepad2 (intake + shooter)");
@@ -58,9 +60,8 @@ public class TwoPlayers extends OpMode {
 
         // Shooter control on GP2
         if (gamepad2.y) {
-            // NOTE: This is still 23 RPM (very slow). Increase if you want more speed.
-            double rpm = 23;
-            robot.startShooter(rpm);
+            // NOTE: This is still 23 RPM (very slow). Increase if you want more speed
+            robot.requestAutoShot();
             robot.shootBallWhenReady();
         }
 

@@ -6,7 +6,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 @TeleOp(name="AutoAim (Blue Tag 20)")
-public class AutoAim extends OpMode {
+public class AutoAimBlue extends OpMode {
 
     private static final int BLUE_BASKET_TAG_ID = 20;   // change to 24 for red
 
@@ -79,6 +79,7 @@ public class AutoAim extends OpMode {
 
         telemetry.addData("Recommended RPM", String.format("%.0f", recommendedRpm));
         telemetry.addData("Shooter State", robot.launchState);
+        telemetry.addData("Start, Current Time, Over", String.format("%f, %f, %b", robot.reverseStartTime, System.currentTimeMillis() / 1000.0, System.currentTimeMillis() / 1000.0 > robot.reverseStartTime + 0.1));
         telemetry.addData("Launcher vel (rad)", robot.leftLaunch.getVelocity(AngleUnit.RADIANS));
 
         telemetry.update();

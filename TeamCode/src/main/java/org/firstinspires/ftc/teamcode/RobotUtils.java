@@ -52,13 +52,15 @@ public class RobotUtils {
     // Auto-shot (AprilTag align -> spin -> feed) variables
     private double autoShotRpm = 0.0;
     private boolean autoShotRequested = false;
-    private double FALLBACK_RPM = 3000.0;
+    private double FALLBACK_RPM = 2500.0;
+    private double REVERSE_DURATION = 0.2;
 
     // Drive state
     public DriveState driveState = DriveState.STOPPED;
     private double targetYaw = 0.0;
     private double driveStartTime = 0.0;
     private double driveEndTime = 0.0;
+    private double imuOffset = 0.0;
 
     // Hardware components
     private DcMotor frontLeftDrive = null;
@@ -74,8 +76,8 @@ public class RobotUtils {
     // Vision variables
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
-    private final int BLUE_TAG_ID = 20;
-    private final int RED_TAG_ID = 24;
+    public static final int BLUE_TAG_ID = 20;
+    public static final int RED_TAG_ID = 24;
     int tagID = 20; // default tag ID for alignment
 
     public RobotUtils(HardwareMap hardwareMap) {
@@ -129,6 +131,11 @@ public class RobotUtils {
 
     public void setAprilTagID(int id) {
         tagID = id;
+        if (tagID == BLUE_TAG_ID) {
+            imuOffset = -90.0;
+        } else if (tagID == RED_TAG_ID) {
+            imuOffset = 90.0;
+        }
     }
 
     // This function drives the robot field-relative
@@ -148,7 +155,7 @@ public class RobotUtils {
 
         // Rotate angle by the angle the robot is pointing
         theta = AngleUnit.normalizeRadians(theta -
-                imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
+                (imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) + imuOffset));
 
         // Convert back to cartesian
         double newForward = r * Math.sin(theta);
@@ -304,7 +311,8 @@ public class RobotUtils {
         switch (launchState) {
             case REVERSING:
                 setLaunchPower(-0.1);
-                if (reverseStartTime + 0.1 < System.currentTimeMillis() / 1000.0) {
+                if (System.currentTimeMillis() / 1000.0 > reverseStartTime + REVERSE_DURATION) {
+                    setLaunchPower(0);
                     setLaunchVelocity(targetVelocity);
                     launchState = LaunchState.SPINNING_UP;
                 }
@@ -357,6 +365,8 @@ public class RobotUtils {
             case ALIGNING:
                 // Override driving while aligning
                 if (isAligned()) {
+                    driveState = DriveState.STOPPED;
+
                     // stop movement once aligned
                     drive(0, 0, 0);
 
