@@ -6,8 +6,11 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 abstract public class AutonomousClose extends RobotUtils {
     protected enum State {
         BACK_UP,
-        SHOOT_BALL,
-        INTAKE_BALL,
+        SHOOT_FIRST_BALL,
+        SHOOT_SECOND_BALL,
+        INTAKE_FIRST_BALL,
+        SHOOT_THIRD_BALL,
+        INTAKE_SECOND_BALL,
         DONE
     }
 
@@ -15,13 +18,6 @@ abstract public class AutonomousClose extends RobotUtils {
     protected final double INTAKE_DURATION = 2.0; // seconds
     protected State currentState = State.BACK_UP;
     protected int currentStep = 0;
-    protected final State[] steps = {State.BACK_UP, State.SHOOT_BALL, State.INTAKE_BALL, State.SHOOT_BALL, State.INTAKE_BALL, State.SHOOT_BALL, State.INTAKE_BALL, State.SHOOT_BALL, State.DONE};
-
-    private void nextStep() {
-        // Update the step number
-        currentStep++;
-        currentState = steps[currentStep];
-    }
 
     @Override
     public void loop() {
@@ -30,35 +26,64 @@ abstract public class AutonomousClose extends RobotUtils {
                 // Just drive for 2.5 seconds, we don't have encoders
                 // driveForSeconds(0.8, -0.5)
                 driveForSeconds(0.5, -0.8);
-                nextStep();
+                currentState = State.SHOOT_FIRST_BALL;
                 break;
 
-            case SHOOT_BALL:
-                if (isStopped() && intakeStartTime + INTAKE_DURATION < getRuntime()) { // Aim at the blue basket tag
+            case SHOOT_FIRST_BALL:
+                if (isStopped()) { // Aim at the blue basket tag
                     requestAutoShot();
-                    nextStep();
+                    currentState = State.INTAKE_FIRST_BALL;
                 }
                 break;
 
-            case INTAKE_BALL:
+            case INTAKE_FIRST_BALL:
                 if (isShotCompleted()) {
                     // Records the time you start intaking the ball
                     intakeStartTime = getRuntime();
 
                     // Start the intake wheel
                     toggleMotor();
-                    nextStep();
                     telemetry.addLine("Robot is intaking the ball");
+
+                    // Update robot state
+                    currentState = State.SHOOT_SECOND_BALL;
+                }
+                break;
+
+            case SHOOT_SECOND_BALL:
+                if (getRuntime() - intakeStartTime > INTAKE_DURATION) {
+                    requestAutoShot();
+                    toggleMotor();
+                    currentState = State.INTAKE_SECOND_BALL;
+                }
+                break;
+
+            case INTAKE_SECOND_BALL:
+                if (isShotCompleted()) {
+                    // Records the time you start intaking the ball
+                    intakeStartTime = getRuntime();
+
+                    // Start the intake wheel
+                    toggleMotor();
+                    telemetry.addLine("Robot is intaking the ball");
+
+                    // Update robot state
+                    currentState = State.SHOOT_THIRD_BALL;
+                }
+                break;
+
+            case SHOOT_THIRD_BALL:
+                if (getRuntime() - intakeStartTime > INTAKE_DURATION) {
+                    requestAutoShot();
+                    toggleMotor();
+                    currentState = State.DONE;
                 }
                 break;
 
             case DONE:
                 telemetry.addLine("Autonomous complete.");
-
                 break;
         }
-
-        // Update the robot
         update();
         telemetry.addData("Shooter State", launchState);
         telemetry.addData("Drive State", driveState);
