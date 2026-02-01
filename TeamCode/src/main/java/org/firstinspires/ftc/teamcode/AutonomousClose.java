@@ -15,7 +15,7 @@ abstract public class AutonomousClose extends RobotUtils {
     }
 
     protected double intakeStartTime = 0.0;
-    protected final double INTAKE_DURATION = 2.0; // seconds
+    protected final double INTAKE_DURATION = 1.5; // seconds
     protected State currentState = State.BACK_UP;
     protected int currentStep = 0;
 
