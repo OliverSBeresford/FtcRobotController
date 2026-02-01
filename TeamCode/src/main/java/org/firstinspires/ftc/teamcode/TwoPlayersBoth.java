@@ -8,6 +8,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 public abstract class TwoPlayersBoth extends RobotUtils {
     // gamepad2 A toggle debounce
     protected boolean intakeWasPressed = false;
+    protected boolean dropWasPressed = false;
 
     @Override
     public void loop() {
@@ -54,8 +55,11 @@ public abstract class TwoPlayersBoth extends RobotUtils {
             shootBallWhenReady();
         }
 
-        if (gamepad2.x) {
+        if (gamepad2.x && !dropWasPressed) {
             toggleMotorReverse();
+            dropWasPressed = true;
+        } else if (!gamepad2.x) {
+            dropWasPressed = false;
         }
 
         if (gamepad2.right_trigger > 0) {
