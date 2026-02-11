@@ -9,7 +9,6 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 public class AutoAim extends OpMode {
 
     private static final int BLUE_BASKET_TAG_ID = 20;   // change to 24 for red
-    private static final double FALLBACK_RPM = 3200;    // used if tag not visible
 
     private RobotUtils robot = null;
 
