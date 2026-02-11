@@ -51,7 +51,7 @@ public class AutoAim extends OpMode {
         boolean yNow = gamepad1.y;
         if (yNow && !yWasPressed) {
             // Start a full auto-shot sequence: align -> set RPM -> shoot
-            robot.requestAutoShot(FALLBACK_RPM);
+            robot.requestAutoShot();
         }
         yWasPressed = yNow;
 

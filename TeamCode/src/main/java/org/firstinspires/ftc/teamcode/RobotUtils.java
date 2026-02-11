@@ -46,6 +46,7 @@ public class RobotUtils {
     public double reverseStartTime = 0.0;
     // Auto-shot (AprilTag align -> spin -> feed) variables
     private double autoShotRpm = 0.0;
+    private double FALLBACK_RPM = 3000.0;
 
     // Hardware components
     private DcMotor frontLeftDrive = null;
@@ -237,11 +238,11 @@ public class RobotUtils {
         feedRequested = true;
     }
 
-    public void requestAutoShot(double fallbackRpm) {
+    public void requestAutoShot() {
         // Calculate recommended RPM based on current range to tag
         autoShotRpm = calculateRPM();
         // Use the provided fallback RPM if we can't see the tag
-        if (autoShotRpm == 0.0) autoShotRpm = fallbackRpm;
+        if (autoShotRpm == 0.0) autoShotRpm = FALLBACK_RPM;
 
         // Kick the state machine into aligning immediately
         launchState = LaunchState.ALIGNING;
