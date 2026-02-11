@@ -30,7 +30,7 @@ public class AutoAim extends OpMode {
 
         // ===== DRIVE / STRAFE =====
         if (gamepad1.b) {
-            robot.reset_imu_yaw();
+            robot.resetImuYaw();
         }
 
         if (gamepad1.left_bumper) {
@@ -41,7 +41,7 @@ public class AutoAim extends OpMode {
 
         // ===== INTAKE MOTOR TOGGLE (A) =====
         if (gamepad1.a && !intakeWasPressed) {
-            robot.toggle_motor();
+            robot.toggleMotor();
             intakeWasPressed = true;
         } else if (!gamepad1.a) {
             intakeWasPressed = false;

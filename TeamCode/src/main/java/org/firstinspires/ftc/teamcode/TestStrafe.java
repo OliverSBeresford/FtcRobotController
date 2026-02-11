@@ -29,13 +29,13 @@ public class TestStrafe extends OpMode {
         // If you press the A button, then you reset the Yaw to be zero from the way
         // the robot is currently pointing
         if (gamepad1.a && !wasPressed) {
-            robot.toggle_motor();
+            robot.toggleMotor();
             wasPressed=true;
         } else if (!gamepad1.a) {
             wasPressed=false;
         }
         if (gamepad1.b) {
-            robot.reset_imu_yaw();
+            robot.resetImuYaw();
         }
         // If you press the left bumper, you get a drive from the point of view of the robot
         // (much like driving an RC vehicle)
