@@ -40,7 +40,7 @@ public class RobotUtils {
     public LaunchState launchState = LaunchState.OFF;
     private double targetVelocity = 0.0;
     private boolean feedRequested = false;
-    private double feedingDuration = 2; // seconds
+    private final double FEEDING_DURATION = 2; // seconds
     public double feedingStartTime = 0.0;
     public double reverseStartTime = 0.0;
     // Auto-shot (AprilTag align -> spin -> feed) variables
@@ -156,7 +156,7 @@ public class RobotUtils {
 
 
         // Normalize the wheel powers if any exceeds 1.0
-        double powers[] = {frontLeftPower, frontRightPower, backRightPower, backLeftPower};
+        double[] powers = {frontLeftPower, frontRightPower, backRightPower, backLeftPower};
         if (maxMagnitude(powers) > 1.0) {
             // Normalize the powers so no wheel power exceeds 1.0
             double maxPower = maxMagnitude(powers);
@@ -223,7 +223,7 @@ public class RobotUtils {
 
     public void startShooter(double velocityRPM) {
         targetVelocity = velocityRPM * 2.0 * Math.PI / 6000.0;
-        reverseStartTime = System.currentTimeMillis() / 1000;
+        reverseStartTime = System.currentTimeMillis() / 1000.0;
         launchState = LaunchState.REVERSING;
     }
 
@@ -271,7 +271,7 @@ public class RobotUtils {
 
             case REVERSING:
                 setLaunchPower(-0.1);
-                if (reverseStartTime + 0.1 < System.currentTimeMillis() / 1000) {
+                if (reverseStartTime + 0.1 < System.currentTimeMillis() / 1000.0) {
                     setLaunchVelocity(targetVelocity);
                     launchState = LaunchState.SPINNING_UP;
                 }
@@ -300,7 +300,7 @@ public class RobotUtils {
                 double currentTime = System.currentTimeMillis() / 1000.0;
 
                 // Wait 2 seconds after starting feeding
-                if (currentTime >= feedingStartTime + feedingDuration) {
+                if (currentTime >= feedingStartTime + FEEDING_DURATION) {
                     feedToLaunch(0.0);  // stop feeder
                     launchState = LaunchState.OFF;
                 }
