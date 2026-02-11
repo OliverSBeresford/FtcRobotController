@@ -29,8 +29,14 @@ public class RobotUtils {
         SPINNING_UP,
         READY,
         FEEDING,
-        ALIGNING,
         REVERSING
+    }
+
+    public enum DriveState {
+        TURNING,
+        DRIVING,
+        ALIGNING,
+        STOPPED
     }
 
     // Constants
@@ -45,7 +51,12 @@ public class RobotUtils {
     public double reverseStartTime = 0.0;
     // Auto-shot (AprilTag align -> spin -> feed) variables
     private double autoShotRpm = 0.0;
+    private boolean autoShotRequested = false;
     private double FALLBACK_RPM = 3000.0;
+
+    // Drive state
+    public DriveState driveState = DriveState.STOPPED;
+    private double targetYaw = 0.0;
 
     // Hardware components
     private DcMotor frontLeftDrive = null;
@@ -173,6 +184,24 @@ public class RobotUtils {
         backRightDrive.setPower(backRightPower);
     }
 
+    public void turnToAngle(double targetAngle) {
+        double kP = 0.01;
+
+        double error = targetAngle - imu.getRobotYawPitchRollAngles().getYaw();
+        double turn = error * kP;
+
+        turn = clamp(turn, -0.4, 0.4);
+        drive(0, 0, turn);
+
+        if (Math.abs(error) < 3.0 && driveState == DriveState.TURNING) driveState = DriveState.STOPPED;
+    }
+
+    public void turnDegrees(double degrees) {
+        targetYaw = imu.getRobotYawPitchRollAngles().getYaw() + degrees;
+
+        driveState = DriveState.TURNING;
+    }
+
     public double maxMagnitude(double... numbers) {
         double maximum = 0;
 
@@ -244,31 +273,15 @@ public class RobotUtils {
         if (autoShotRpm == 0.0) autoShotRpm = FALLBACK_RPM;
 
         // Kick the state machine into aligning immediately
-        launchState = LaunchState.ALIGNING;
+        driveState = DriveState.ALIGNING;
+
+        autoShotRequested = true;
     }
 
-    public void updateShooter() {
+    private void updateShooter() {
         double vel = leftLaunch.getVelocity(AngleUnit.RADIANS);
 
         switch (launchState) {
-            case ALIGNING:
-                // Override driving while aligning
-                if (isAligned()) {
-                    // stop movement once aligned
-                    drive(0, 0, 0);
-
-                    // Start shooter at the RPM we computed from range
-                    startShooter(autoShotRpm);   // <-- sets launchState = REVERSING
-
-                    // IMPORTANT: keep a request to feed once we reach speed
-                    feedRequested = true;
-
-                    // Note: startShooter already moved us to REVERSING state
-                } else {
-                    alignToAprilTag();
-                }
-                break;
-
             case REVERSING:
                 setLaunchPower(-0.1);
                 if (reverseStartTime + 0.1 < System.currentTimeMillis() / 1000.0) {
@@ -317,6 +330,39 @@ public class RobotUtils {
                 // do nothing
                 break;
         }
+    }
+
+    private void updateDrive() {
+        switch (driveState) {
+            case ALIGNING:
+                // Override driving while aligning
+                if (isAligned()) {
+                    // stop movement once aligned
+                    drive(0, 0, 0);
+
+                    // Don't start the shooter if they didn't request to shoot
+                    if (!autoShotRequested) return;
+
+                    // Start shooter at the RPM we computed from range
+                    startShooter(autoShotRpm);   // <-- sets launchState = REVERSING
+
+                    // IMPORTANT: keep a request to feed once we reach speed
+                    feedRequested = true;
+
+                    // Note: startShooter already moved us to REVERSING state
+                } else {
+                    alignToAprilTag();
+                }
+                break;
+
+            case TURNING:
+                turnToAngle(targetYaw);
+        }
+    }
+
+    public void update() {
+        updateShooter();
+        updateDrive();
     }
 
     public boolean isShotCompleted() {
@@ -372,7 +418,7 @@ public class RobotUtils {
     }
 
     // Add data about AprilTag detections.
-    public AprilTagPoseFtc get_apriltag_data() {
+    public AprilTagPoseFtc getApriltagData() {
 
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
 
@@ -387,7 +433,7 @@ public class RobotUtils {
     }
 
     public void alignToAprilTag() {
-        AprilTagPoseFtc pose = get_apriltag_data();
+        AprilTagPoseFtc pose = getApriltagData();
         if (pose == null) {
             drive(0, 0, 0); // Stop if no tag
             return;
@@ -411,7 +457,7 @@ public class RobotUtils {
     }
 
     public boolean isAligned() {
-        AprilTagPoseFtc pose = get_apriltag_data();
+        AprilTagPoseFtc pose = getApriltagData();
         if (pose == null) return true;
 
         return Math.abs(pose.bearing) < 5.0; // only bearing for now;
@@ -420,7 +466,7 @@ public class RobotUtils {
     public double calculateRPM() {
         if (leftLaunch == null) return 0.0;
 
-        AprilTagPoseFtc pose = get_apriltag_data();
+        AprilTagPoseFtc pose = getApriltagData();
         if (pose == null) return 0.0;
 
         return rpmFromRange(pose.range);

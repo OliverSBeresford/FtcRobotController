@@ -63,6 +63,7 @@ public class AutonomousBlue extends OpMode {
                 telemetry.addLine("Autonomous complete.");
                 break;
         }
+        robot.update();
         telemetry.update();
     }
 }

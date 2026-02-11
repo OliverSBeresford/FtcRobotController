@@ -69,7 +69,7 @@ public class TwoPlayers extends OpMode {
         }
 
         // Must be called every loop
-        robot.updateShooter();
+        robot.update();
 
         // =========================
         // TELEMETRY

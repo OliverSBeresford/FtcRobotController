@@ -60,10 +60,10 @@ public class AutoAim extends OpMode {
         }
 
         // Must be called every loop
-        robot.updateShooter();
+        robot.update();
 
         // Get data for telemetry
-        AprilTagPoseFtc pose = robot.get_apriltag_data();
+        AprilTagPoseFtc pose = robot.getApriltagData();
         double recommendedRpm = robot.calculateRPM();
         // ===== TELEMETRY =====
         telemetry.addData("Tag Seen?", (pose != null));

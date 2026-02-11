@@ -66,7 +66,7 @@ public class TestLaunch extends OpMode {
         }
 
         // Must be called every loop
-        robot.updateShooter();
+        robot.update();
 
         telemetry.addData("Shooter State", robot.launchState);
         telemetry.addData("Velocity", robot.leftLaunch.getVelocity(AngleUnit.RADIANS));
