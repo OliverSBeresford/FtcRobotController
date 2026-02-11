@@ -24,7 +24,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class RobotUtils {
-    private enum LaunchState {
+    public enum LaunchState {
         OFF,
         SPINNING_UP,
         READY,
@@ -35,7 +35,6 @@ public class RobotUtils {
 
     // Constants
     private static final double TOLERANCE = 0.1; // Tolerance for velocity checks in RPM
-    private final int MAX_VELOCITY = 6000; // Max velocity of the Yellow Jacket motors in RPM
 
     // Variables to keep track of launch state
     public LaunchState launchState = LaunchState.OFF;
