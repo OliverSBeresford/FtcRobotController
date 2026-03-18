@@ -42,7 +42,7 @@ Concept:	This is a sample OpMode that illustrates performing a specific function
             These may be complex, but their operation should be explained clearly in the comments,
             or the comments should reference an external doc, guide or tutorial.
             Each OpMode should try to only demonstrate a single concept so they are easy to
-            locate based on their name.  These OpModes may not produce a drivable robot.
+            locate based on their name.  These OpModes may not produce a drivable 
 
 After the prefix, other conventions will apply:
 
@@ -51,7 +51,7 @@ After the prefix, other conventions will apply:
 * Concept class names are constructed as:   Concept - Topic - OpModetype
 
 Once you are familiar with the range of samples available, you can choose one to be the
-basis for your own robot.  In all cases, the desired sample(s) needs to be copied into
+basis for your own   In all cases, the desired sample(s) needs to be copied into
 your TeamCode module to be used.
 
 This is done inside Android Studio directly, using the following steps:
@@ -68,7 +68,7 @@ This is done inside Android Studio directly, using the following steps:
     Choose something meaningful based on the purpose of this class.
     Start with a capital letter, and remember that there may be more similar classes later.
 
-Once your copy has been created, you should prepare it for use on your robot.
+Once your copy has been created, you should prepare it for use on your 
 This is done by adjusting the OpMode's name, and enabling it to be displayed on the
 Driver Station's OpMode list.
 
